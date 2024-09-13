@@ -59,3 +59,18 @@ describe('divide', () => {
     expect(script.divide(1, 0)).toBe(Infinity);
   });
 });
+
+describe('operate', () => {
+  test('adds 3 and 5', () => {
+    expect(script.operate("3", "+", "5")).toBe(8);
+  });
+  test('subtracts 3 and 5', () => {
+    expect(script.operate("3", "-", "5")).toBe(-2);
+  });
+  test('multiplies 3 and 5', () => {
+    expect(script.operate("3", "*", "5")).toBe(15);
+  });
+  test('divides 3 and 5', () => {
+    expect(script.operate("3", "/", "5")).toBe(0.6);
+  });
+});
