@@ -1,0 +1,22 @@
+{
+  "name": "odin-calculator",
+  "version": "0.1",
+  "description": "Learning project: Create a calculator in Javascript",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brgillis/odin-calculator"
+  },
+  "devDependencies": {
+    "jest": "^29.6.4",
+    "jest-cli": "^29.6.4"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "jest": {
+    "testPathIgnorePatterns": [
+      "generators/"
+    ]
+  }
+}
