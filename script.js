@@ -101,14 +101,26 @@ function updateNumber (s) {
 function pressNumberButton (e) {
   updateNumber(e.target.textContent);
 }
+function pressClearButton() {
+  inputMode = FIRST_NUMBER;
+  displayText = "";
+  inputStrings[0] = "";
+  inputStrings[1] = "";
+  inputStrings[2] = "";
+  updateDisplay();
+}
 
 // Connect functions to each button
 for (const buttonRow of calcButtons.children) {
   for (const button of buttonRow.children) {
+
     buttonClasses = Array.from(button.classList);
+
     if (buttonClasses.includes("number") || buttonClasses.includes("decimal")) {
       button.addEventListener("click", pressNumberButton);
-    } // TODO else...
+    } else if (buttonClasses.includes("clear")) {
+      button.addEventListener("click", pressClearButton);
+    }
   }
 }
 
