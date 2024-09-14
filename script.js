@@ -98,7 +98,11 @@ function updateNumber (s) {
 }
 
 function updateOperator (s) {
-  // Update input mode - if first number, move onto operator. If second number, operate then move onto new second number
+  // If we already have the second number input, operate on it
+  if (inputMode===SECOND_NUMBER) {
+    operateOnInput();
+  }
+  // If we were inputting the first number, move on to inputting the operator
   if (inputMode===FIRST_NUMBER) {
     inputMode = OPP;
     // Check if initial input was empty, and set to 0 if so
@@ -106,8 +110,6 @@ function updateOperator (s) {
       inputStrings[0] = "0";
       displayText = "0";
     }
-  } else if (inputMode===SECOND_NUMBER) {
-    // TODO - operate
   }
 
   let inputIndex = getInputIndex(); // Will be 1
@@ -123,6 +125,30 @@ function updateOperator (s) {
   inputStrings[inputIndex] += s;
 }
 
+function resetInput() {
+  inputMode = FIRST_NUMBER;
+  displayText = "";
+  inputStrings[0] = "";
+  inputStrings[1] = "";
+  inputStrings[2] = "";
+}
+
+function operateOnInput() {
+  // Only do something if current mode is entering the second number
+  if (inputMode!==SECOND_NUMBER)
+    return;
+
+  let result = operate(...inputStrings);
+
+  resetInput();
+
+  let inputIndex = getInputIndex(); // Will be 1
+  inputStrings[inputIndex] = String(result);
+  displayText = inputStrings[inputIndex];
+
+  updateDisplay();
+}
+
 // Functions to be connected to button presses
 function pressNumberButton (e) {
   updateNumber(e.target.textContent);
@@ -131,12 +157,11 @@ function pressOppButton (e) {
   updateOperator(e.target.textContent);
 }
 function pressClearButton() {
-  inputMode = FIRST_NUMBER;
-  displayText = "";
-  inputStrings[0] = "";
-  inputStrings[1] = "";
-  inputStrings[2] = "";
+  resetInput();
   updateDisplay();
+}
+function pressEqualsButton() {
+  operateOnInput();
 }
 
 // Connect functions to each button
@@ -151,6 +176,8 @@ for (const buttonRow of calcButtons.children) {
       button.addEventListener("click", pressOppButton);
     } else if (buttonClasses.includes("clear")) {
       button.addEventListener("click", pressClearButton);
+    } else if (buttonClasses.includes("equals")) {
+      button.addEventListener("click", pressEqualsButton);
     }
   }
 }
