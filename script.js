@@ -33,6 +33,11 @@ function multiply(a, b) {
 }
 
 function divide(a, b) {
+  if (b==0) {
+    inputMode = ERR;
+    return "ERR";
+  }
+
   let result = a/b;
 
   // Round the result to the desired number of decimal places
@@ -59,6 +64,8 @@ function operate(a, opp, b) {
 
 // Functions called as-needed
 function updateDisplay() {
+  if (inputMode===ERR)
+    displayText = "ERR";
   if (displayText==="")
     calcDisplay.value = "0";
   else
@@ -161,6 +168,11 @@ function operateOnInput() {
 
   let result = operate(...inputStrings);
 
+  if (inputMode===ERR) {
+    updateDisplay();
+    return;
+  }
+
   resetInput();
 
   let inputIndex = getInputIndex(); // Will be 1
@@ -192,9 +204,15 @@ function negateCurrentInput (s) {
 
 // Functions to be connected to button presses
 function pressNumberButton (e) {
+  // Button is non-functional if an error has occurred
+  if (inputMode===ERR)
+    return;
   updateNumber(e.target.textContent);
 }
 function pressOppButton (e) {
+  // Button is non-functional if an error has occurred
+  if (inputMode===ERR)
+    return;
   updateOperator(e.target.textContent);
 }
 function pressClearButton() {
@@ -202,9 +220,15 @@ function pressClearButton() {
   updateDisplay();
 }
 function pressEqualsButton() {
+  // Button is non-functional if an error has occurred
+  if (inputMode===ERR)
+    return;
   operateOnInput();
 }
 function pressNegateButton() {
+  // Button is non-functional if an error has occurred
+  if (inputMode===ERR)
+    return;
   negateCurrentInput();
 }
 
