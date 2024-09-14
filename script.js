@@ -1,5 +1,6 @@
 // Constants 
 
+const RESULT = -2;
 const ERR = -1;
 const FIRST_NUMBER = 0;
 const OPP = 1;
@@ -77,40 +78,29 @@ function addToDisplay(s) {
   updateDisplay();
 }
 
-function getInputIndex() {
-  switch (inputMode) {
-    case FIRST_NUMBER:
-      return 0;
-    case OPP:
-      return 1;
-    case SECOND_NUMBER:
-      return 2;
-    default:
-      return -1;
-  }
-}
-
 function updateNumber (s) {
   // Update input mode - either continue first or second number, or switch from opp to second number
-  if (inputMode===OPP)
+  if (inputMode===OPP) {
     inputMode = SECOND_NUMBER;
-
-  let inputIndex = getInputIndex(); // Will be 0 or 2
+  } else if (inputMode===RESULT) {
+    // Not supported
+    return;
+  }
   
   // Special handling for decimals
   if (s===".") {
     // If the input string is currently empty, silently input a "0" first
-    if (inputStrings[inputIndex]==="") {
+    if (inputStrings[inputMode]==="") {
       updateNumber("0");  
     // Silently do nothing if the input already includes a decimal for this number
-    } else if (inputStrings[inputIndex].includes(".")) {
+    } else if (inputStrings[inputMode].includes(".")) {
       return;
     }
   }
 
   // Get the operator typed and add it to the display and whichever number we're currently typing
   addToDisplay(s);
-  inputStrings[inputIndex] += s;
+  inputStrings[inputMode] += s;
 }
 
 function reconstructDisplayText() {
@@ -121,17 +111,16 @@ function updateOperator (s) {
   // If the last number was negated but not specified, change it into zero
   if (inputMode===FIRST_NUMBER || inputMode===SECOND_NUMBER)
   {
-    let inputIndex = getInputIndex(); // Will be 0 or 2
-    if (inputStrings[inputIndex]==="-")
-      inputStrings[inputIndex] = "-0";
+    if (inputStrings[inputMode]==="-")
+      inputStrings[inputMode] = "-0";
       reconstructDisplayText();
   }
   // If we already have the second number input, operate on it
   if (inputMode===SECOND_NUMBER) {
     operateOnInput();
   }
-  // If we were inputting the first number, move on to inputting the operator
-  if (inputMode===FIRST_NUMBER) {
+  // If we were inputting the first number or are in result mode, move on to inputting the operator
+  if (inputMode===FIRST_NUMBER || inputMode===RESULT) {
     inputMode = OPP;
     // Check if initial input was empty, and set to 0 if so
     if (inputStrings[0]==="") {
@@ -140,17 +129,15 @@ function updateOperator (s) {
     }
   }
 
-  let inputIndex = getInputIndex(); // Will be 1
-
   // If an operator is already present, remove and replace it
-  if (inputStrings[inputIndex] !== "") {
-    inputStrings[inputIndex] = "";
+  if (inputStrings[OPP] !== "") {
+    inputStrings[OPP] = "";
     displayText = displayText.slice(0,-1);
   }
 
   // Get the operator typed and add it to the display and whichever number we're currently typing
   addToDisplay(s);
-  inputStrings[inputIndex] += s;
+  inputStrings[OPP] += s;
 }
 
 function resetInput() {
@@ -175,9 +162,10 @@ function operateOnInput() {
 
   resetInput();
 
-  let inputIndex = getInputIndex(); // Will be 1
-  inputStrings[inputIndex] = String(result);
-  displayText = inputStrings[inputIndex];
+  // Set to result mode, to avoid confusion if the user starts typing more numbers next
+  inputMode = RESULT;
+  inputStrings[FIRST_NUMBER] = String(result);
+  displayText = String(result);
 
   updateDisplay();
 }
@@ -187,14 +175,12 @@ function negateCurrentInput (s) {
   if (inputMode===OPP)
     inputMode = SECOND_NUMBER;
 
-  let inputIndex = getInputIndex(); // Will be 0 or 2
-
   // Check if the current number is already negated, and handle differently if so
-  if (inputStrings[inputIndex]!=="" && inputStrings[inputIndex][0]=="-")
+  if (inputStrings[inputMode]!=="" && inputStrings[inputMode][0]=="-")
   {
-    inputStrings[inputIndex] = inputStrings[inputIndex].slice(1);
+    inputStrings[inputMode] = inputStrings[inputMode].slice(1);
   } else {
-    inputStrings[inputIndex] = "-" + inputStrings[inputIndex];
+    inputStrings[inputMode] = "-" + inputStrings[inputMode];
   }
 
   reconstructDisplayText();
@@ -204,13 +190,13 @@ function negateCurrentInput (s) {
 
 // Functions to be connected to button presses
 function pressNumberButton (e) {
-  // Button is non-functional if an error has occurred
-  if (inputMode===ERR)
+  // Button is non-functional in error and result mode
+  if (inputMode===ERR || inputMode===RESULT)
     return;
   updateNumber(e.target.textContent);
 }
 function pressOppButton (e) {
-  // Button is non-functional if an error has occurred
+  // Button is non-functional in error mode
   if (inputMode===ERR)
     return;
   updateOperator(e.target.textContent);
@@ -220,14 +206,14 @@ function pressClearButton() {
   updateDisplay();
 }
 function pressEqualsButton() {
-  // Button is non-functional if an error has occurred
-  if (inputMode===ERR)
+  // Button is non-functional in error and result mode
+  if (inputMode===ERR || inputMode===RESULT)
     return;
   operateOnInput();
 }
 function pressNegateButton() {
-  // Button is non-functional if an error has occurred
-  if (inputMode===ERR)
+  // Button is non-functional in error and result mode
+  if (inputMode===ERR || inputMode===RESULT)
     return;
   negateCurrentInput();
 }
