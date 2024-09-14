@@ -97,7 +97,19 @@ function updateNumber (s) {
   inputStrings[inputIndex] += s;
 }
 
+function reconstructDisplayText() {
+  displayText = inputStrings[0] + inputStrings[1] + inputStrings[2];
+}
+
 function updateOperator (s) {
+  // If the last number was negated but not specified, change it into zero
+  if (inputMode===FIRST_NUMBER || inputMode===SECOND_NUMBER)
+  {
+    let inputIndex = getInputIndex(); // Will be 0 or 2
+    if (inputStrings[inputIndex]==="-")
+      inputStrings[inputIndex] = "-0";
+      reconstructDisplayText();
+  }
   // If we already have the second number input, operate on it
   if (inputMode===SECOND_NUMBER) {
     operateOnInput();
@@ -149,6 +161,26 @@ function operateOnInput() {
   updateDisplay();
 }
 
+function negateCurrentInput (s) {
+  // Update input mode - if we're on the operatore, move to the second number
+  if (inputMode===OPP)
+    inputMode = SECOND_NUMBER;
+
+  let inputIndex = getInputIndex(); // Will be 0 or 2
+
+  // Check if the current number is already negated, and handle differently if so
+  if (inputStrings[inputIndex]!=="" && inputStrings[inputIndex][0]=="-")
+  {
+    inputStrings[inputIndex] = inputStrings[inputIndex].slice(1);
+  } else {
+    inputStrings[inputIndex] = "-" + inputStrings[inputIndex];
+  }
+
+  reconstructDisplayText();
+
+  updateDisplay();
+}
+
 // Functions to be connected to button presses
 function pressNumberButton (e) {
   updateNumber(e.target.textContent);
@@ -162,6 +194,9 @@ function pressClearButton() {
 }
 function pressEqualsButton() {
   operateOnInput();
+}
+function pressNegateButton() {
+  negateCurrentInput();
 }
 
 // Connect functions to each button
@@ -178,6 +213,8 @@ for (const buttonRow of calcButtons.children) {
       button.addEventListener("click", pressClearButton);
     } else if (buttonClasses.includes("equals")) {
       button.addEventListener("click", pressEqualsButton);
+    } else if (buttonClasses.includes("negate")) {
+      button.addEventListener("click", pressNegateButton);
     }
   }
 }
