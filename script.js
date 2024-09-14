@@ -81,9 +81,16 @@ function updateNumber (s) {
 
   let inputIndex = getInputIndex(); // Will be 0 or 2
   
-  // If we're inputting a decimal and the input string is currently empty, silently input a "0" first
-  if (s==="." && inputStrings[inputIndex]==="")
-    updateNumber("0");
+  // Special handling for decimals
+  if (s===".") {
+    // If the input string is currently empty, silently input a "0" first
+    if (inputStrings[inputIndex]==="") {
+      updateNumber("0");  
+    // Silently do nothing if the input already includes a decimal for this number
+    } else if (inputStrings[inputIndex].includes(".")) {
+      return;
+    }
+  } 
 
   // Get the number typed and add it to the display and whichever number we're currently typing
   addToDisplay(s);
