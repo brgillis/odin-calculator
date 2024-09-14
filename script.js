@@ -1,3 +1,23 @@
+// Constants 
+
+const ERR = -1;
+const FIRST_NUMBER = 0;
+const OPP = 1;
+const SECOND_NUMBER = 2;
+
+const MAX_DECIMALS = 4
+const ROUND_FACTOR = Math.pow(10,MAX_DECIMALS);
+
+// Variables to track current state of the calculator
+
+let inputMode = FIRST_NUMBER;
+let displayText = "";
+const inputStrings = ["", "", ""];
+
+// Connections to nodes
+const calcDisplay = document.querySelector(".calc-display input");
+const calcButtons = document.querySelector(".calc-buttons");
+
 // Define basic calculator functions
 
 function add(a, b) {
@@ -13,7 +33,10 @@ function multiply(a, b) {
 }
 
 function divide(a, b) {
-  return a/b;
+  let result = a/b;
+
+  // Round the result to the desired number of decimal places
+  return Math.round(result*ROUND_FACTOR)/ROUND_FACTOR;
 }
 
 function operate(a, opp, b) {
@@ -33,20 +56,6 @@ function operate(a, opp, b) {
       return "ERR";
   }
 }
-
-// Connections to nodes
-const calcDisplay = document.querySelector(".calc-display input");
-const calcButtons = document.querySelector(".calc-buttons");
-
-// Variables to track current state of the calculator
-
-const FIRST_NUMBER = 0;
-const OPP = 1;
-const SECOND_NUMBER = 2;
-
-let inputMode = FIRST_NUMBER;
-let displayText = "";
-const inputStrings = ["", "", ""];
 
 // Functions called as-needed
 function updateDisplay() {
