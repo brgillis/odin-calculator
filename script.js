@@ -17,7 +17,7 @@ function divide(a, b) {
 }
 
 function operate(a, opp, b) {
-  // Silently convert a and be to numbers
+  // Silently convert a and b to numbers
   a = +a;
   b = +b;
   switch (opp) {
