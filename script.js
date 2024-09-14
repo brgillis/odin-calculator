@@ -46,9 +46,7 @@ const SECOND_NUMBER = 2;
 
 let inputMode = FIRST_NUMBER;
 let displayText = "";
-let firstNumberString;
-let oppString;
-let secondNumberString;
+const inputStrings = ["", "", ""];
 
 // Functions called as-needed
 function updateDisplay() {
@@ -63,29 +61,45 @@ function addToDisplay(s) {
   updateDisplay();
 }
 
-// Functions to be connected to button presses
-function pressNumberButton (e) {
+function getInputIndex() {
+  switch (inputMode) {
+    case FIRST_NUMBER:
+      return 0;
+    case OPP:
+      return 1;
+    case SECOND_NUMBER:
+      return 2;
+    default:
+      return -1;
+  }
+}
+
+function updateNumber (s) {
   // Update input mode - either continue first or second number, or switch from opp to second number
   if (inputMode===OPP)
     inputMode = SECOND_NUMBER;
 
+  let inputIndex = getInputIndex(); // Will be 0 or 2
+  
+  // If we're inputting a decimal and the input string is currently empty, silently input a "0" first
+  if (s==="." && inputStrings[inputIndex]==="")
+    updateNumber("0");
+
   // Get the number typed and add it to the display and whichever number we're currently typing
-  let digitString = e.target.textContent;
-  addToDisplay(digitString);
+  addToDisplay(s);
+  inputStrings[inputIndex] += s;
+}
 
-  if (inputMode===FIRST_NUMBER) {
-    firstNumberString += digitString;
-  } else {
-    secondNumberString += digitString;
-  }
-
+// Functions to be connected to button presses
+function pressNumberButton (e) {
+  updateNumber(e.target.textContent);
 }
 
 // Connect functions to each button
 for (const buttonRow of calcButtons.children) {
   for (const button of buttonRow.children) {
     buttonClasses = Array.from(button.classList);
-    if (buttonClasses.includes("number")) {
+    if (buttonClasses.includes("number") || buttonClasses.includes("decimal")) {
       button.addEventListener("click", pressNumberButton);
     } // TODO else...
   }
