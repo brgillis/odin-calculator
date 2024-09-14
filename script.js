@@ -90,9 +90,35 @@ function updateNumber (s) {
     } else if (inputStrings[inputIndex].includes(".")) {
       return;
     }
-  } 
+  }
 
-  // Get the number typed and add it to the display and whichever number we're currently typing
+  // Get the operator typed and add it to the display and whichever number we're currently typing
+  addToDisplay(s);
+  inputStrings[inputIndex] += s;
+}
+
+function updateOperator (s) {
+  // Update input mode - if first number, move onto operator. If second number, operate then move onto new second number
+  if (inputMode===FIRST_NUMBER) {
+    inputMode = OPP;
+    // Check if initial input was empty, and set to 0 if so
+    if (inputStrings[0]==="") {
+      inputStrings[0] = "0";
+      displayText = "0";
+    }
+  } else if (inputMode===SECOND_NUMBER) {
+    // TODO - operate
+  }
+
+  let inputIndex = getInputIndex(); // Will be 1
+
+  // If an operator is already present, remove and replace it
+  if (inputStrings[inputIndex] !== "") {
+    inputStrings[inputIndex] = "";
+    displayText = displayText.slice(0,-1);
+  }
+
+  // Get the operator typed and add it to the display and whichever number we're currently typing
   addToDisplay(s);
   inputStrings[inputIndex] += s;
 }
@@ -100,6 +126,9 @@ function updateNumber (s) {
 // Functions to be connected to button presses
 function pressNumberButton (e) {
   updateNumber(e.target.textContent);
+}
+function pressOppButton (e) {
+  updateOperator(e.target.textContent);
 }
 function pressClearButton() {
   inputMode = FIRST_NUMBER;
@@ -118,6 +147,8 @@ for (const buttonRow of calcButtons.children) {
 
     if (buttonClasses.includes("number") || buttonClasses.includes("decimal")) {
       button.addEventListener("click", pressNumberButton);
+    } else if (buttonClasses.includes("opp")) {
+      button.addEventListener("click", pressOppButton);
     } else if (buttonClasses.includes("clear")) {
       button.addEventListener("click", pressClearButton);
     }
