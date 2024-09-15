@@ -17,7 +17,7 @@ const inputStrings = ["", "", ""];
 
 // Connections to nodes
 const calcDisplay = document.querySelector(".calc-display input");
-const calcButtons = document.querySelector(".calc-buttons");
+const calcButtonRows = document.querySelectorAll(".calc-button-row");
 
 // Define basic calculator functions
 
@@ -219,7 +219,7 @@ function pressNegateButton() {
 }
 
 // Connect functions to each button
-for (const buttonRow of calcButtons.children) {
+for (const buttonRow of calcButtonRows) {
   for (const button of buttonRow.children) {
 
     buttonClasses = Array.from(button.classList);
