@@ -16,8 +16,8 @@ let displayText = "";
 const inputStrings = ["", "", ""];
 
 // Connections to nodes
+const calculator = document.querySelector(".calculator");
 const calcDisplay = document.querySelector(".calc-display input");
-const calcButtonRows = document.querySelectorAll(".calc-button-row");
 
 // Define basic calculator functions
 
@@ -38,29 +38,31 @@ function divide(a, b) {
     inputMode = ERR;
     return "ERR";
   }
-
-  let result = a/b;
-
-  // Round the result to the desired number of decimal places
-  return Math.round(result*ROUND_FACTOR)/ROUND_FACTOR;
+  return a/b;
 }
 
 function operate(a, opp, b) {
   // Silently convert a and b to numbers
   a = +a;
   b = +b;
+  let result;
   switch (opp) {
     case "+":
-      return add(a, b);
+      result = add(a, b);
+      break;
     case "-":
-      return subtract(a, b);
+      result = subtract(a, b);
+      break;
     case "*":
-      return multiply(a, b);
+      result = multiply(a, b);
+      break;
     case "/":
-      return divide(a, b);
+      result = divide(a, b);
+      break;
     default:
       return "ERR";
   }
+  return result;
 }
 
 // Functions called as-needed
@@ -165,7 +167,9 @@ function operateOnInput() {
   // Set to result mode, to avoid confusion if the user starts typing more numbers next
   inputMode = RESULT;
   inputStrings[FIRST_NUMBER] = String(result);
-  displayText = String(result);
+  
+  roundResult = Math.round(result*ROUND_FACTOR)/ROUND_FACTOR;
+  displayText = String(roundResult);
 
   updateDisplay();
 }
@@ -218,25 +222,26 @@ function pressNegateButton() {
   negateCurrentInput();
 }
 
-// Connect functions to each button
-for (const buttonRow of calcButtonRows) {
-  for (const button of buttonRow.children) {
+// Event delegation function for any button press
+function pressButton(e) {
 
-    buttonClasses = Array.from(button.classList);
+  buttonClasses = Array.from(e.target.classList);
 
-    if (buttonClasses.includes("number") || buttonClasses.includes("decimal")) {
-      button.addEventListener("click", pressNumberButton);
-    } else if (buttonClasses.includes("opp")) {
-      button.addEventListener("click", pressOppButton);
-    } else if (buttonClasses.includes("clear")) {
-      button.addEventListener("click", pressClearButton);
-    } else if (buttonClasses.includes("equals")) {
-      button.addEventListener("click", pressEqualsButton);
-    } else if (buttonClasses.includes("negate")) {
-      button.addEventListener("click", pressNegateButton);
-    }
+  if (buttonClasses.includes("number") || buttonClasses.includes("decimal")) {
+    return pressNumberButton(e);
+  } else if (buttonClasses.includes("opp")) {
+    return pressOppButton(e);
+  } else if (buttonClasses.includes("clear")) {
+    return pressClearButton(e);
+  } else if (buttonClasses.includes("equals")) {
+    return pressEqualsButton(e);
+  } else if (buttonClasses.includes("negate")) {
+    return pressNegateButton(e);
   }
 }
+
+// Connect the delegation function to the calculator
+calculator.addEventListener("click", pressButton);
 
 // Export the functions we've defined so they can be tested
 module.exports = {
