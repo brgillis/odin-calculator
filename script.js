@@ -192,18 +192,18 @@ function negateCurrentInput (s) {
   updateDisplay();
 }
 
-// Functions to be connected to button presses
-function pressNumberButton (e) {
+// Functions to be connected to button and key presses
+function pressNumberButton (c) {
   // Button is non-functional in error and result mode
   if (inputMode===ERR || inputMode===RESULT)
     return;
-  updateNumber(e.target.textContent);
+  updateNumber(c);
 }
-function pressOppButton (e) {
+function pressOppButton (c) {
   // Button is non-functional in error mode
   if (inputMode===ERR)
     return;
-  updateOperator(e.target.textContent);
+  updateOperator(c);
 }
 function pressClearButton() {
   resetInput();
@@ -228,20 +228,36 @@ function pressButton(e) {
   buttonClasses = Array.from(e.target.classList);
 
   if (buttonClasses.includes("number") || buttonClasses.includes("decimal")) {
-    return pressNumberButton(e);
+    return pressNumberButton(e.target.textContent);
   } else if (buttonClasses.includes("opp")) {
-    return pressOppButton(e);
+    return pressOppButton(e.target.textContent);
   } else if (buttonClasses.includes("clear")) {
-    return pressClearButton(e);
+    return pressClearButton(e.target.textContent);
   } else if (buttonClasses.includes("equals")) {
-    return pressEqualsButton(e);
+    return pressEqualsButton(e.target.textContent);
   } else if (buttonClasses.includes("negate")) {
-    return pressNegateButton(e);
+    return pressNegateButton(e.target.textContent);
+  }
+}
+
+// Event delegation function for any keypress51351
+function pressKey(e) {
+  if (('0' <= e.key && e.key <= '9') || (e.key==='.')) {
+    return pressNumberButton(e.key);
+  } else if (['+','-','*','/'].includes(e.key)) {
+    return pressOppButton(e.key);
+  } else if (e.key=='c' || e.key === "Backspace" || e.key === "Delete") {
+    return pressClearButton(e.key);
+  } else if (e.key=="Enter") {
+    return pressEqualsButton(e.key);
+  } else if (e.key==="_") {
+    return pressNegateButton(e.key);
   }
 }
 
 // Connect the delegation function to the calculator
 calculator.addEventListener("click", pressButton);
+document.addEventListener("keydown", pressKey);
 
 // Export the functions we've defined so they can be tested
 module.exports = {
